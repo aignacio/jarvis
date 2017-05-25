@@ -20,46 +20,41 @@ client.on('connect', function() {
 
 client.on('message', function(topic, message) {
   console.log('MQTT Pub: '+topic+' - '+message);
-  if (message.indexOf("temp") > -1) {
-    console.log("Requesting temperature...");
-    readWeatherProvis(topic.split('/')[2]);
-  }
+  texttospeak(topic.split('/')[2],message);
 });
 
-function readWeatherProvis(language) {
-  weather(city).then(info => {
-    let weatherTemp = info.item.condition.temp;
-    let params;
-    if (language === 'pt') {
-      params = {
-        'Text': '  Olá amigo, a temperatura em '+city+' é de ' + weatherTemp + ' graus',
-        'OutputFormat': 'pcm',
-        'VoiceId': 'Ricardo'
-      };
-    } else {
-      params = {
-        'Text': '  Hi friend, the temperature on '+city+' is around '+weatherTemp + ' degrees Celsius',
-        'OutputFormat': 'pcm',
-        'VoiceId': 'Joey'
-      };
-    }
+function texttospeak(lang, message) {
+  let params;
+  if (lang === 'pt') {
+    params = {
+      'Text': String(message),
+      'OutputFormat': 'pcm',
+      'VoiceId': 'Ricardo'
+    };
+  }
+  else {
+    params = {
+      'Text': String(message),
+      'OutputFormat': 'pcm',
+      'VoiceId': 'Joey'
+    };
+  }
 
-    Polly.synthesizeSpeech(params, (err, data) => {
-      if (err) {
-        console.log(err.code);
-      } else if (data) {
-        if (data.AudioStream instanceof Buffer) {
-          let Player = new speaker({
-            channels: 1,
-            bitDepth: 16,
-            sampleRate: 16000
-          });
+  Polly.synthesizeSpeech(params, (err, data) => {
+    if (err) {
+      console.log(err.code);
+    } else if (data) {
+      if (data.AudioStream instanceof Buffer) {
+        let Player = new speaker({
+          channels: 1,
+          bitDepth: 16,
+          sampleRate: 16000
+        });
 
-          let bufferStream = new Stream.PassThrough();
-          bufferStream.pipe(Player);
-          bufferStream.end(data.AudioStream);
-        }
+        let bufferStream = new Stream.PassThrough();
+        bufferStream.pipe(Player);
+        bufferStream.end(data.AudioStream);
       }
-    });
-  }).catch(err => {});
+    }
+  });
 }
