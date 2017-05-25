@@ -14,8 +14,8 @@
   "author": "Ânderson I. da Silva",
   "license": "ISC",
   "dependencies": {
-    "speaker": "^0.3.0",
     "aws-sdk": ">= 2.0.9",
+    "mqtt": "^2.7.2",
     "node-uuid": ">= 1.4.1",
     "openweather-node": "0.0.4",
     "play-sound": "^1.1.1",
